@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 namespace Azure.ResourceManager.Network.Tests.Tests
 {
-    public class ExpressRouteTests : NetworkTestsManagementClientBase
+    public class ExpressRouteTests : NetworkServiceClientTestBase
     {
         public ExpressRouteTests(bool isAsync) : base(isAsync)
         {
@@ -58,7 +58,7 @@ namespace Azure.ResourceManager.Network.Tests.Tests
         public async Task BGPCommunityApiTest()
         {
             _ = await NetworkManagementTestUtilities.GetResourceLocation(ResourceManagementClient, "Microsoft.Network/routefilters");
-            AsyncPageable<Models.BgpServiceCommunity> communitiesAsync = NetworkManagementClient.BgpServiceCommunities.ListAsync();
+            AsyncPageable<Models.BgpServiceCommunity> communitiesAsync = ArmClient.DefaultSubscription.ListBgpServiceCommunitiesAsync();
             Task<List<Models.BgpServiceCommunity>> communities = communitiesAsync.ToEnumerableAsync();
             Assert.NotNull(communities);
             Assert.True(communities.Result.First().BgpCommunities.First().IsAuthorizedToUse);
@@ -76,31 +76,31 @@ namespace Azure.ResourceManager.Network.Tests.Tests
             string filterName = "filter";
             string ruleName = "rule";
 
-            Models.RouteFilter filter = await CreateDefaultRouteFilter(resourceGroupName,
-                filterName, location, NetworkManagementClient);
+            RouteFilter filter = await CreateDefaultRouteFilter(resourceGroupName,
+                filterName, location);
 
-            Assert.AreEqual(filter.Name, filterName);
-            Assert.IsEmpty(filter.Rules);
+            Assert.AreEqual(filter.Data.Name, filterName);
+            Assert.IsEmpty(filter.Data.Rules);
 
             // Update route filter with rule by put on parent resources
             filter = await CreateDefaultRouteFilter(resourceGroupName,
-                filterName, location, NetworkManagementClient, true);
+                filterName, location, true);
 
-            Assert.AreEqual(filter.Name, filterName);
-            Assert.IsNotEmpty(filter.Rules);
+            Assert.AreEqual(filter.Data.Name, filterName);
+            Assert.IsNotEmpty(filter.Data.Rules);
 
             // Update route filter and delete rules
             filter = await CreateDefaultRouteFilter(resourceGroupName,
-               filterName, location, NetworkManagementClient);
+               filterName, location);
 
-            Assert.AreEqual(filter.Name, filterName);
-            Assert.IsEmpty(filter.Rules);
+            Assert.AreEqual(filter.Data.Name, filterName);
+            Assert.IsEmpty(filter.Data.Rules);
 
             filter = await CreateDefaultRouteFilterRule(resourceGroupName,
-                filterName, ruleName, location, NetworkManagementClient);
+                filterName, ruleName, location);
 
-            Assert.AreEqual(filter.Name, filterName);
-            Assert.IsNotEmpty(filter.Rules);
+            Assert.AreEqual(filter.Data.Name, filterName);
+            Assert.IsNotEmpty(filter.Data.Rules);
         }
 
         [Test]
@@ -114,18 +114,18 @@ namespace Azure.ResourceManager.Network.Tests.Tests
 
             string circuitName = "circuit";
 
-            Models.ExpressRouteCircuit circuit = await CreateDefaultExpressRouteCircuit(resourceGroupName,
-                circuitName, location, NetworkManagementClient);
+            ExpressRouteCircuit circuit = await CreateDefaultExpressRouteCircuit(resourceGroupName,
+                circuitName, location);
 
-            Assert.AreEqual(circuit.Name, circuitName);
-            Assert.AreEqual(circuit.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
+            Assert.AreEqual(circuit.Data.Name, circuitName);
+            Assert.AreEqual(circuit.Data.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
 
             circuit = await UpdateDefaultExpressRouteCircuitWithMicrosoftPeering(resourceGroupName,
-                circuitName, NetworkManagementClient);
+                circuitName);
 
-            Assert.AreEqual(circuit.Name, circuitName);
-            Assert.AreEqual(circuit.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
-            Assert.NotNull(circuit.Peerings);
+            Assert.AreEqual(circuit.Data.Name, circuitName);
+            Assert.AreEqual(circuit.Data.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
+            Assert.NotNull(circuit.Data.Peerings);
         }
 
         [Test]
@@ -139,18 +139,18 @@ namespace Azure.ResourceManager.Network.Tests.Tests
 
             string circuitName = "circuit";
 
-            Models.ExpressRouteCircuit circuit = await CreateDefaultExpressRouteCircuit(resourceGroupName,
-                circuitName, location, NetworkManagementClient);
+            ExpressRouteCircuit circuit = await CreateDefaultExpressRouteCircuit(resourceGroupName,
+                circuitName, location);
 
-            Assert.AreEqual(circuit.Name, circuitName);
-            Assert.AreEqual(circuit.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
+            Assert.AreEqual(circuit.Data.Name, circuitName);
+            Assert.AreEqual(circuit.Data.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
 
             circuit = await UpdateDefaultExpressRouteCircuitWithIpv6MicrosoftPeering(resourceGroupName,
-                circuitName, NetworkManagementClient);
+                circuitName);
 
-            Assert.AreEqual(circuit.Name, circuitName);
-            Assert.AreEqual(circuit.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
-            Assert.NotNull(circuit.Peerings);
+            Assert.AreEqual(circuit.Data.Name, circuitName);
+            Assert.AreEqual(circuit.Data.ServiceProviderProperties.BandwidthInMbps, Convert.ToInt32(Circuit_BW));
+            Assert.NotNull(circuit.Data.Peerings);
         }
     }
 }

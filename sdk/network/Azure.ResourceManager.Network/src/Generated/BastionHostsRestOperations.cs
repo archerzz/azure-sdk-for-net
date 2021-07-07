@@ -6,6 +6,7 @@
 #nullable disable
 
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace Azure.ResourceManager.Network
     {
         private string subscriptionId;
         private Uri endpoint;
+        private string apiVersion;
         private ClientDiagnostics _clientDiagnostics;
         private HttpPipeline _pipeline;
 
@@ -28,17 +30,23 @@ namespace Azure.ResourceManager.Network
         /// <param name="pipeline"> The HTTP pipeline for sending and receiving REST requests and responses. </param>
         /// <param name="subscriptionId"> The subscription credentials which uniquely identify the Microsoft Azure subscription. The subscription ID forms part of the URI for every service call. </param>
         /// <param name="endpoint"> server parameter. </param>
-        /// <exception cref="ArgumentNullException"> <paramref name="subscriptionId"/> is null. </exception>
-        public BastionHostsRestOperations(ClientDiagnostics clientDiagnostics, HttpPipeline pipeline, string subscriptionId, Uri endpoint = null)
+        /// <param name="apiVersion"> Api Version. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="subscriptionId"/> or <paramref name="apiVersion"/> is null. </exception>
+        public BastionHostsRestOperations(ClientDiagnostics clientDiagnostics, HttpPipeline pipeline, string subscriptionId, Uri endpoint = null, string apiVersion = "2021-02-01")
         {
             if (subscriptionId == null)
             {
                 throw new ArgumentNullException(nameof(subscriptionId));
             }
             endpoint ??= new Uri("https://management.azure.com");
+            if (apiVersion == null)
+            {
+                throw new ArgumentNullException(nameof(apiVersion));
+            }
 
             this.subscriptionId = subscriptionId;
             this.endpoint = endpoint;
+            this.apiVersion = apiVersion;
             _clientDiagnostics = clientDiagnostics;
             _pipeline = pipeline;
         }
@@ -56,7 +64,7 @@ namespace Azure.ResourceManager.Network
             uri.AppendPath(resourceGroupName, true);
             uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
             uri.AppendPath(bastionHostName, true);
-            uri.AppendQuery("api-version", "2020-04-01", true);
+            uri.AppendQuery("api-version", apiVersion, true);
             request.Uri = uri;
             request.Headers.Add("Accept", "application/json");
             return message;
@@ -133,7 +141,7 @@ namespace Azure.ResourceManager.Network
             uri.AppendPath(resourceGroupName, true);
             uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
             uri.AppendPath(bastionHostName, true);
-            uri.AppendQuery("api-version", "2020-04-01", true);
+            uri.AppendQuery("api-version", apiVersion, true);
             request.Uri = uri;
             request.Headers.Add("Accept", "application/json");
             return message;
@@ -144,7 +152,7 @@ namespace Azure.ResourceManager.Network
         /// <param name="bastionHostName"> The name of the Bastion Host. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
-        public async Task<Response<BastionHost>> GetAsync(string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
+        public async Task<Response<BastionHostData>> GetAsync(string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
         {
             if (resourceGroupName == null)
             {
@@ -161,9 +169,9 @@ namespace Azure.ResourceManager.Network
             {
                 case 200:
                     {
-                        BastionHost value = default;
+                        BastionHostData value = default;
                         using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
-                        value = BastionHost.DeserializeBastionHost(document.RootElement);
+                        value = BastionHostData.DeserializeBastionHostData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
@@ -176,7 +184,7 @@ namespace Azure.ResourceManager.Network
         /// <param name="bastionHostName"> The name of the Bastion Host. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
-        public Response<BastionHost> Get(string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
+        public Response<BastionHostData> Get(string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
         {
             if (resourceGroupName == null)
             {
@@ -193,9 +201,9 @@ namespace Azure.ResourceManager.Network
             {
                 case 200:
                     {
-                        BastionHost value = default;
+                        BastionHostData value = default;
                         using var document = JsonDocument.Parse(message.Response.ContentStream);
-                        value = BastionHost.DeserializeBastionHost(document.RootElement);
+                        value = BastionHostData.DeserializeBastionHostData(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
@@ -203,7 +211,7 @@ namespace Azure.ResourceManager.Network
             }
         }
 
-        internal HttpMessage CreateCreateOrUpdateRequest(string resourceGroupName, string bastionHostName, BastionHost parameters)
+        internal HttpMessage CreateCreateOrUpdateRequest(string resourceGroupName, string bastionHostName, BastionHostData parameters)
         {
             var message = _pipeline.CreateMessage();
             var request = message.Request;
@@ -216,7 +224,7 @@ namespace Azure.ResourceManager.Network
             uri.AppendPath(resourceGroupName, true);
             uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
             uri.AppendPath(bastionHostName, true);
-            uri.AppendQuery("api-version", "2020-04-01", true);
+            uri.AppendQuery("api-version", apiVersion, true);
             request.Uri = uri;
             request.Headers.Add("Accept", "application/json");
             request.Headers.Add("Content-Type", "application/json");
@@ -232,7 +240,7 @@ namespace Azure.ResourceManager.Network
         /// <param name="parameters"> Parameters supplied to the create or update Bastion Host operation. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/>, <paramref name="bastionHostName"/>, or <paramref name="parameters"/> is null. </exception>
-        public async Task<Response> CreateOrUpdateAsync(string resourceGroupName, string bastionHostName, BastionHost parameters, CancellationToken cancellationToken = default)
+        public async Task<Response> CreateOrUpdateAsync(string resourceGroupName, string bastionHostName, BastionHostData parameters, CancellationToken cancellationToken = default)
         {
             if (resourceGroupName == null)
             {
@@ -265,7 +273,7 @@ namespace Azure.ResourceManager.Network
         /// <param name="parameters"> Parameters supplied to the create or update Bastion Host operation. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/>, <paramref name="bastionHostName"/>, or <paramref name="parameters"/> is null. </exception>
-        public Response CreateOrUpdate(string resourceGroupName, string bastionHostName, BastionHost parameters, CancellationToken cancellationToken = default)
+        public Response CreateOrUpdate(string resourceGroupName, string bastionHostName, BastionHostData parameters, CancellationToken cancellationToken = default)
         {
             if (resourceGroupName == null)
             {
@@ -302,7 +310,7 @@ namespace Azure.ResourceManager.Network
             uri.AppendPath("/subscriptions/", false);
             uri.AppendPath(subscriptionId, true);
             uri.AppendPath("/providers/Microsoft.Network/bastionHosts", false);
-            uri.AppendQuery("api-version", "2020-04-01", true);
+            uri.AppendQuery("api-version", apiVersion, true);
             request.Uri = uri;
             request.Headers.Add("Accept", "application/json");
             return message;
@@ -360,7 +368,7 @@ namespace Azure.ResourceManager.Network
             uri.AppendPath("/resourceGroups/", false);
             uri.AppendPath(resourceGroupName, true);
             uri.AppendPath("/providers/Microsoft.Network/bastionHosts", false);
-            uri.AppendQuery("api-version", "2020-04-01", true);
+            uri.AppendQuery("api-version", apiVersion, true);
             request.Uri = uri;
             request.Headers.Add("Accept", "application/json");
             return message;
@@ -413,6 +421,462 @@ namespace Azure.ResourceManager.Network
                         BastionHostListResult value = default;
                         using var document = JsonDocument.Parse(message.Response.ContentStream);
                         value = BastionHostListResult.DeserializeBastionHostListResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateCreateShareableLinksRequest(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Post;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
+            uri.AppendPath(bastionHostName, true);
+            uri.AppendPath("/createShareableLinks", false);
+            uri.AppendQuery("api-version", apiVersion, true);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            request.Headers.Add("Content-Type", "application/json");
+            BastionShareableLinkListRequest bastionShareableLinkListRequest = new BastionShareableLinkListRequest();
+            if (vms != null)
+            {
+                foreach (var value in vms)
+                {
+                    bastionShareableLinkListRequest.Vms.Add(value);
+                }
+            }
+            var model = bastionShareableLinkListRequest;
+            var content = new Utf8JsonRequestContent();
+            content.JsonWriter.WriteObjectValue(model);
+            request.Content = content;
+            return message;
+        }
+
+        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response> CreateShareableLinksAsync(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateCreateShareableLinksRequest(resourceGroupName, bastionHostName, vms);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                case 202:
+                    return message.Response;
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public Response CreateShareableLinks(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateCreateShareableLinksRequest(resourceGroupName, bastionHostName, vms);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                case 202:
+                    return message.Response;
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateDeleteShareableLinksRequest(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Post;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
+            uri.AppendPath(bastionHostName, true);
+            uri.AppendPath("/deleteShareableLinks", false);
+            uri.AppendQuery("api-version", apiVersion, true);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            request.Headers.Add("Content-Type", "application/json");
+            BastionShareableLinkListRequest bastionShareableLinkListRequest = new BastionShareableLinkListRequest();
+            if (vms != null)
+            {
+                foreach (var value in vms)
+                {
+                    bastionShareableLinkListRequest.Vms.Add(value);
+                }
+            }
+            var model = bastionShareableLinkListRequest;
+            var content = new Utf8JsonRequestContent();
+            content.JsonWriter.WriteObjectValue(model);
+            request.Content = content;
+            return message;
+        }
+
+        /// <summary> Deletes the Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response> DeleteShareableLinksAsync(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateDeleteShareableLinksRequest(resourceGroupName, bastionHostName, vms);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                case 202:
+                    return message.Response;
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Deletes the Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public Response DeleteShareableLinks(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateDeleteShareableLinksRequest(resourceGroupName, bastionHostName, vms);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                case 202:
+                    return message.Response;
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateGetShareableLinksRequest(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Post;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
+            uri.AppendPath(bastionHostName, true);
+            uri.AppendPath("/getShareableLinks", false);
+            uri.AppendQuery("api-version", apiVersion, true);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            request.Headers.Add("Content-Type", "application/json");
+            BastionShareableLinkListRequest bastionShareableLinkListRequest = new BastionShareableLinkListRequest();
+            if (vms != null)
+            {
+                foreach (var value in vms)
+                {
+                    bastionShareableLinkListRequest.Vms.Add(value);
+                }
+            }
+            var model = bastionShareableLinkListRequest;
+            var content = new Utf8JsonRequestContent();
+            content.JsonWriter.WriteObjectValue(model);
+            request.Content = content;
+            return message;
+        }
+
+        /// <summary> Return the Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response<BastionShareableLinkListResult>> GetShareableLinksAsync(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetShareableLinksRequest(resourceGroupName, bastionHostName, vms);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionShareableLinkListResult value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = BastionShareableLinkListResult.DeserializeBastionShareableLinkListResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Return the Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public Response<BastionShareableLinkListResult> GetShareableLinks(string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetShareableLinksRequest(resourceGroupName, bastionHostName, vms);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionShareableLinkListResult value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = BastionShareableLinkListResult.DeserializeBastionShareableLinkListResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateGetActiveSessionsRequest(string resourceGroupName, string bastionHostName)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Post;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
+            uri.AppendPath(bastionHostName, true);
+            uri.AppendPath("/getActiveSessions", false);
+            uri.AppendQuery("api-version", apiVersion, true);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            return message;
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response> GetActiveSessionsAsync(string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetActiveSessionsRequest(resourceGroupName, bastionHostName);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                case 202:
+                    return message.Response;
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public Response GetActiveSessions(string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetActiveSessionsRequest(resourceGroupName, bastionHostName);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                case 202:
+                    return message.Response;
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateDisconnectActiveSessionsRequest(string resourceGroupName, string bastionHostName, IEnumerable<string> sessionIds)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Post;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendPath("/subscriptions/", false);
+            uri.AppendPath(subscriptionId, true);
+            uri.AppendPath("/resourceGroups/", false);
+            uri.AppendPath(resourceGroupName, true);
+            uri.AppendPath("/providers/Microsoft.Network/bastionHosts/", false);
+            uri.AppendPath(bastionHostName, true);
+            uri.AppendPath("/disconnectActiveSessions", false);
+            uri.AppendQuery("api-version", apiVersion, true);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            request.Headers.Add("Content-Type", "application/json");
+            SessionIds sessionIds0 = new SessionIds();
+            if (sessionIds != null)
+            {
+                foreach (var value in sessionIds)
+                {
+                    sessionIds0.SessionIdsValue.Add(value);
+                }
+            }
+            var model = sessionIds0;
+            var content = new Utf8JsonRequestContent();
+            content.JsonWriter.WriteObjectValue(model);
+            request.Content = content;
+            return message;
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="sessionIds"> List of session IDs. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response<BastionSessionDeleteResult>> DisconnectActiveSessionsAsync(string resourceGroupName, string bastionHostName, IEnumerable<string> sessionIds = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateDisconnectActiveSessionsRequest(resourceGroupName, bastionHostName, sessionIds);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionSessionDeleteResult value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = BastionSessionDeleteResult.DeserializeBastionSessionDeleteResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="sessionIds"> List of session IDs. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="resourceGroupName"/> or <paramref name="bastionHostName"/> is null. </exception>
+        public Response<BastionSessionDeleteResult> DisconnectActiveSessions(string resourceGroupName, string bastionHostName, IEnumerable<string> sessionIds = null, CancellationToken cancellationToken = default)
+        {
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateDisconnectActiveSessionsRequest(resourceGroupName, bastionHostName, sessionIds);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionSessionDeleteResult value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = BastionSessionDeleteResult.DeserializeBastionSessionDeleteResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:
@@ -557,6 +1021,340 @@ namespace Azure.ResourceManager.Network
                         BastionHostListResult value = default;
                         using var document = JsonDocument.Parse(message.Response.ContentStream);
                         value = BastionHostListResult.DeserializeBastionHostListResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateCreateShareableLinksNextPageRequest(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Get;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            return message;
+        }
+
+        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response> CreateShareableLinksNextPageAsync(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateCreateShareableLinksNextPageRequest(nextLink, resourceGroupName, bastionHostName, vms);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    return message.Response;
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public Response CreateShareableLinksNextPage(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateCreateShareableLinksNextPageRequest(nextLink, resourceGroupName, bastionHostName, vms);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    return message.Response;
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateGetShareableLinksNextPageRequest(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Get;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            return message;
+        }
+
+        /// <summary> Return the Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response<BastionShareableLinkListResult>> GetShareableLinksNextPageAsync(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetShareableLinksNextPageRequest(nextLink, resourceGroupName, bastionHostName, vms);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionShareableLinkListResult value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = BastionShareableLinkListResult.DeserializeBastionShareableLinkListResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Return the Bastion Shareable Links for all the VMs specified in the request. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="vms"> List of VM references. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public Response<BastionShareableLinkListResult> GetShareableLinksNextPage(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetShareableLinksNextPageRequest(nextLink, resourceGroupName, bastionHostName, vms);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionShareableLinkListResult value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = BastionShareableLinkListResult.DeserializeBastionShareableLinkListResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateGetActiveSessionsNextPageRequest(string nextLink, string resourceGroupName, string bastionHostName)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Get;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            return message;
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response> GetActiveSessionsNextPageAsync(string nextLink, string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetActiveSessionsNextPageRequest(nextLink, resourceGroupName, bastionHostName);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    return message.Response;
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public Response GetActiveSessionsNextPage(string nextLink, string resourceGroupName, string bastionHostName, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateGetActiveSessionsNextPageRequest(nextLink, resourceGroupName, bastionHostName);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    return message.Response;
+                default:
+                    throw _clientDiagnostics.CreateRequestFailedException(message.Response);
+            }
+        }
+
+        internal HttpMessage CreateDisconnectActiveSessionsNextPageRequest(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<string> sessionIds)
+        {
+            var message = _pipeline.CreateMessage();
+            var request = message.Request;
+            request.Method = RequestMethod.Get;
+            var uri = new RawRequestUriBuilder();
+            uri.Reset(endpoint);
+            uri.AppendRawNextLink(nextLink, false);
+            request.Uri = uri;
+            request.Headers.Add("Accept", "application/json");
+            return message;
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="sessionIds"> List of session IDs. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public async Task<Response<BastionSessionDeleteResult>> DisconnectActiveSessionsNextPageAsync(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<string> sessionIds = null, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateDisconnectActiveSessionsNextPageRequest(nextLink, resourceGroupName, bastionHostName, sessionIds);
+            await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionSessionDeleteResult value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = BastionSessionDeleteResult.DeserializeBastionSessionDeleteResult(document.RootElement);
+                        return Response.FromValue(value, message.Response);
+                    }
+                default:
+                    throw await _clientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        /// <param name="nextLink"> The URL to the next page of results. </param>
+        /// <param name="resourceGroupName"> The name of the resource group. </param>
+        /// <param name="bastionHostName"> The name of the Bastion Host. </param>
+        /// <param name="sessionIds"> List of session IDs. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="nextLink"/>, <paramref name="resourceGroupName"/>, or <paramref name="bastionHostName"/> is null. </exception>
+        public Response<BastionSessionDeleteResult> DisconnectActiveSessionsNextPage(string nextLink, string resourceGroupName, string bastionHostName, IEnumerable<string> sessionIds = null, CancellationToken cancellationToken = default)
+        {
+            if (nextLink == null)
+            {
+                throw new ArgumentNullException(nameof(nextLink));
+            }
+            if (resourceGroupName == null)
+            {
+                throw new ArgumentNullException(nameof(resourceGroupName));
+            }
+            if (bastionHostName == null)
+            {
+                throw new ArgumentNullException(nameof(bastionHostName));
+            }
+
+            using var message = CreateDisconnectActiveSessionsNextPageRequest(nextLink, resourceGroupName, bastionHostName, sessionIds);
+            _pipeline.Send(message, cancellationToken);
+            switch (message.Response.Status)
+            {
+                case 200:
+                    {
+                        BastionSessionDeleteResult value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = BastionSessionDeleteResult.DeserializeBastionSessionDeleteResult(document.RootElement);
                         return Response.FromValue(value, message.Response);
                     }
                 default:

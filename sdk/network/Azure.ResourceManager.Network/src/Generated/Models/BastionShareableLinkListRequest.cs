@@ -11,7 +11,7 @@ using Azure.Core;
 namespace Azure.ResourceManager.Network.Models
 {
     /// <summary> Post request for all the Bastion Shareable Link endpoints. </summary>
-    public partial class BastionShareableLinkListRequest
+    internal partial class BastionShareableLinkListRequest
     {
         /// <summary> Initializes a new instance of BastionShareableLinkListRequest. </summary>
         public BastionShareableLinkListRequest()

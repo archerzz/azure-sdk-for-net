@@ -11,7 +11,7 @@ using Azure.Core;
 namespace Azure.ResourceManager.Network.Models
 {
     /// <summary> List of session IDs. </summary>
-    public partial class SessionIds
+    internal partial class SessionIds
     {
         /// <summary> Initializes a new instance of SessionIds. </summary>
         public SessionIds()
