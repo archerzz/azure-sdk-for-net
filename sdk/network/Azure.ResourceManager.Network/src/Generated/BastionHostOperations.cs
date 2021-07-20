@@ -163,81 +163,81 @@ namespace Azure.ResourceManager.Network
             }
         }
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<Response<AsyncPageable<BastionShareableLink>>> CreateShareableLinksAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinks");
-            scope.Start();
-            try
-            {
-                var operation = await StartCreateShareableLinksAsync(vms, cancellationToken).ConfigureAwait(false);
-                return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<Response<AsyncPageable<BastionShareableLink>>> CreateShareableLinksAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinks");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = await StartCreateShareableLinksAsync(vms, cancellationToken).ConfigureAwait(false);
+        //        return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public Response<AsyncPageable<BastionShareableLink>> CreateShareableLinks(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinks");
-            scope.Start();
-            try
-            {
-                var operation = StartCreateShareableLinks(vms, cancellationToken);
-                return operation.WaitForCompletion(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public Response<AsyncPageable<BastionShareableLink>> CreateShareableLinks(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinks");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = StartCreateShareableLinks(vms, cancellationToken);
+        //        return operation.WaitForCompletion(cancellationToken);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<BastionHostsCreateShareableLinksOperation> StartCreateShareableLinksAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinks");
-            scope.Start();
-            try
-            {
-                var response = await _restClient.CreateShareableLinksAsync(Id.ResourceGroupName, Id.Name, vms, cancellationToken).ConfigureAwait(false);
-                return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<BastionHostsCreateShareableLinksOperation> StartCreateShareableLinksAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinks");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = await _restClient.CreateShareableLinksAsync(Id.ResourceGroupName, Id.Name, vms, cancellationToken).ConfigureAwait(false);
+        //        return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public BastionHostsCreateShareableLinksOperation StartCreateShareableLinks(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinks");
-            scope.Start();
-            try
-            {
-                var response = _restClient.CreateShareableLinks(Id.ResourceGroupName, Id.Name, vms, cancellationToken);
-                return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public BastionHostsCreateShareableLinksOperation StartCreateShareableLinks(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinks");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = _restClient.CreateShareableLinks(Id.ResourceGroupName, Id.Name, vms, cancellationToken);
+        //        return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
         /// <summary> Deletes the Bastion Shareable Links for all the VMs specified in the request. </summary>
         /// <param name="vms"> List of VM references. </param>
@@ -315,224 +315,224 @@ namespace Azure.ResourceManager.Network
             }
         }
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<Response<AsyncPageable<BastionActiveSession>>> GetActiveSessionsAsync(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessions");
-            scope.Start();
-            try
-            {
-                var operation = await StartGetActiveSessionsAsync(cancellationToken).ConfigureAwait(false);
-                return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<Response<AsyncPageable<BastionActiveSession>>> GetActiveSessionsAsync(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessions");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = await StartGetActiveSessionsAsync(cancellationToken).ConfigureAwait(false);
+        //        return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public Response<AsyncPageable<BastionActiveSession>> GetActiveSessions(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessions");
-            scope.Start();
-            try
-            {
-                var operation = StartGetActiveSessions(cancellationToken);
-                return operation.WaitForCompletion(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public Response<AsyncPageable<BastionActiveSession>> GetActiveSessions(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessions");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = StartGetActiveSessions(cancellationToken);
+        //        return operation.WaitForCompletion(cancellationToken);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<BastionHostsGetActiveSessionsOperation> StartGetActiveSessionsAsync(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessions");
-            scope.Start();
-            try
-            {
-                var response = await _restClient.GetActiveSessionsAsync(Id.ResourceGroupName, Id.Name, cancellationToken).ConfigureAwait(false);
-                return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsRequest(Id.ResourceGroupName, Id.Name).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<BastionHostsGetActiveSessionsOperation> StartGetActiveSessionsAsync(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessions");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = await _restClient.GetActiveSessionsAsync(Id.ResourceGroupName, Id.Name, cancellationToken).ConfigureAwait(false);
+        //        return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsRequest(Id.ResourceGroupName, Id.Name).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public BastionHostsGetActiveSessionsOperation StartGetActiveSessions(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessions");
-            scope.Start();
-            try
-            {
-                var response = _restClient.GetActiveSessions(Id.ResourceGroupName, Id.Name, cancellationToken);
-                return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsRequest(Id.ResourceGroupName, Id.Name).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public BastionHostsGetActiveSessionsOperation StartGetActiveSessions(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessions");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = _restClient.GetActiveSessions(Id.ResourceGroupName, Id.Name, cancellationToken);
+        //        return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsRequest(Id.ResourceGroupName, Id.Name).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<Response<AsyncPageable<BastionShareableLink>>> CreateShareableLinksNextPageAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinksNextPage");
-            scope.Start();
-            try
-            {
-                var operation = await StartCreateShareableLinksNextPageAsync(vms, cancellationToken).ConfigureAwait(false);
-                return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<Response<AsyncPageable<BastionShareableLink>>> CreateShareableLinksNextPageAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinksNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = await StartCreateShareableLinksNextPageAsync(vms, cancellationToken).ConfigureAwait(false);
+        //        return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public Response<AsyncPageable<BastionShareableLink>> CreateShareableLinksNextPage(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinksNextPage");
-            scope.Start();
-            try
-            {
-                var operation = StartCreateShareableLinksNextPage(vms, cancellationToken);
-                return operation.WaitForCompletion(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public Response<AsyncPageable<BastionShareableLink>> CreateShareableLinksNextPage(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.CreateShareableLinksNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = StartCreateShareableLinksNextPage(vms, cancellationToken);
+        //        return operation.WaitForCompletion(cancellationToken);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<BastionHostsCreateShareableLinksOperation> StartCreateShareableLinksNextPageAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinksNextPage");
-            scope.Start();
-            try
-            {
-                var response = await _restClient.CreateShareableLinksNextPageAsync(Id.ResourceGroupName, Id.Name, vms, cancellationToken).ConfigureAwait(false);
-                return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksNextPageRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<BastionHostsCreateShareableLinksOperation> StartCreateShareableLinksNextPageAsync(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinksNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = await _restClient.CreateShareableLinksNextPageAsync(Id.ResourceGroupName, Id.Name, vms, cancellationToken).ConfigureAwait(false);
+        //        return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksNextPageRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
-        /// <param name="vms"> List of VM references. </param>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public BastionHostsCreateShareableLinksOperation StartCreateShareableLinksNextPage(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinksNextPage");
-            scope.Start();
-            try
-            {
-                var response = _restClient.CreateShareableLinksNextPage(Id.ResourceGroupName, Id.Name, vms, cancellationToken);
-                return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksNextPageRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Creates a Bastion Shareable Links for all the VMs specified in the request. </summary>
+        ///// <param name="vms"> List of VM references. </param>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public BastionHostsCreateShareableLinksOperation StartCreateShareableLinksNextPage(IEnumerable<BastionShareableLink> vms = null, CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartCreateShareableLinksNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = _restClient.CreateShareableLinksNextPage(Id.ResourceGroupName, Id.Name, vms, cancellationToken);
+        //        return new BastionHostsCreateShareableLinksOperation(_clientDiagnostics, Pipeline, _restClient.CreateCreateShareableLinksNextPageRequest(Id.ResourceGroupName, Id.Name, vms).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<Response<AsyncPageable<BastionActiveSession>>> GetActiveSessionsNextPageAsync(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessionsNextPage");
-            scope.Start();
-            try
-            {
-                var operation = await StartGetActiveSessionsNextPageAsync(cancellationToken).ConfigureAwait(false);
-                return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<Response<AsyncPageable<BastionActiveSession>>> GetActiveSessionsNextPageAsync(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessionsNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = await StartGetActiveSessionsNextPageAsync(cancellationToken).ConfigureAwait(false);
+        //        return await operation.WaitForCompletionAsync(cancellationToken).ConfigureAwait(false);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public Response<AsyncPageable<BastionActiveSession>> GetActiveSessionsNextPage(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessionsNextPage");
-            scope.Start();
-            try
-            {
-                var operation = StartGetActiveSessionsNextPage(cancellationToken);
-                return operation.WaitForCompletion(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public Response<AsyncPageable<BastionActiveSession>> GetActiveSessionsNextPage(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.GetActiveSessionsNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var operation = StartGetActiveSessionsNextPage(cancellationToken);
+        //        return operation.WaitForCompletion(cancellationToken);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public async Task<BastionHostsGetActiveSessionsOperation> StartGetActiveSessionsNextPageAsync(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessionsNextPage");
-            scope.Start();
-            try
-            {
-                var response = await _restClient.GetActiveSessionsNextPageAsync(Id.ResourceGroupName, Id.Name, cancellationToken).ConfigureAwait(false);
-                return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsNextPageRequest(Id.ResourceGroupName, Id.Name).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public async Task<BastionHostsGetActiveSessionsOperation> StartGetActiveSessionsNextPageAsync(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessionsNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = await _restClient.GetActiveSessionsNextPageAsync(Id.ResourceGroupName, Id.Name, cancellationToken).ConfigureAwait(false);
+        //        return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsNextPageRequest(Id.ResourceGroupName, Id.Name).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
 
-        /// <summary> Returns the list of currently active sessions on the Bastion. </summary>
-        /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public BastionHostsGetActiveSessionsOperation StartGetActiveSessionsNextPage(CancellationToken cancellationToken = default)
-        {
-            using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessionsNextPage");
-            scope.Start();
-            try
-            {
-                var response = _restClient.GetActiveSessionsNextPage(Id.ResourceGroupName, Id.Name, cancellationToken);
-                return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsNextPageRequest(Id.ResourceGroupName, Id.Name).Request, response);
-            }
-            catch (Exception e)
-            {
-                scope.Failed(e);
-                throw;
-            }
-        }
+        ///// <summary> Returns the list of currently active sessions on the Bastion. </summary>
+        ///// <param name="cancellationToken"> The cancellation token to use. </param>
+        //public BastionHostsGetActiveSessionsOperation StartGetActiveSessionsNextPage(CancellationToken cancellationToken = default)
+        //{
+        //    using var scope = _clientDiagnostics.CreateScope("BastionHostOperations.StartGetActiveSessionsNextPage");
+        //    scope.Start();
+        //    try
+        //    {
+        //        var response = _restClient.GetActiveSessionsNextPage(Id.ResourceGroupName, Id.Name, cancellationToken);
+        //        return new BastionHostsGetActiveSessionsOperation(_clientDiagnostics, Pipeline, _restClient.CreateGetActiveSessionsNextPageRequest(Id.ResourceGroupName, Id.Name).Request, response);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        scope.Failed(e);
+        //        throw;
+        //    }
+        //}
     }
 }

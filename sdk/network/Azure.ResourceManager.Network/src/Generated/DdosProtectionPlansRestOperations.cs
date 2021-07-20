@@ -230,7 +230,7 @@ namespace Azure.ResourceManager.Network
             request.Headers.Add("Content-Type", "application/json");
             var model = new DdosProtectionPlanData(location)
             {
-                Tags = tags
+                //Tags = tags
             };
             var content = new Utf8JsonRequestContent();
             content.JsonWriter.WriteObjectValue(model);
