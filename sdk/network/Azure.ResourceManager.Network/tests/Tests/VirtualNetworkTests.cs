@@ -272,12 +272,11 @@ namespace Azure.ResourceManager.Network.Tests.Tests
             Assert.AreEqual(putVnet2.Value.Id, peeringVnet.Value.Data.VirtualNetworkPeerings[0].RemoteVirtualNetwork.Id);
 
             // Delete Peering
-            var deleteOperation = await peeringVnet.Value.StartDeleteAsync();
+            var deleteOperation = await getPeer.Value.StartDeleteAsync();
             await WaitForCompletionAsync(deleteOperation);
 
-            listPeerAP = virtualNetworkPeeringContainer.ListAsync();
-            listPeer = await listPeerAP.ToEnumerableAsync();
-            Assert.IsEmpty(listPeer);
+            var listResult = await virtualNetworkPeeringContainer.ListAsync().ToEnumerableAsync().ConfigureAwait(false);
+            Assert.IsEmpty(listResult);
 
             peeringVnet = await virtualNetworkContainer.GetAsync(vnet1Name);
             Assert.AreEqual(vnet1Name, peeringVnet.Value.Data.Name);
