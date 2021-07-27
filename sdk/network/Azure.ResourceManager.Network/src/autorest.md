@@ -194,6 +194,10 @@ directive:
   - rename-model:
       from: PacketCaptureResult
       to: PacketCapture
+# routeFilter.json
+  - from: swagger-document
+    where: $.paths["/subscriptions/{subscriptionId}/providers/Microsoft.Network/routeFilters"].get.operationId
+    transform: return "RouteFilters_ListAll"
 # applicationgateway.json
   - from: swagger-document
     where: $.paths["/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableServerVariables"].get.operationId

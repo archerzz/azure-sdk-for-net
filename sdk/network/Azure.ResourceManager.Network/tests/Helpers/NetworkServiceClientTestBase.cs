@@ -95,7 +95,13 @@ namespace Azure.ResourceManager.Network.Tests.Helpers
 
         private ArmClient GetArmClient()
         {
-            return new ArmClient(TestEnvironment.Credential);
+            if (string.IsNullOrEmpty(TestEnvironment.SubscriptionId))
+            {
+                return new ArmClient(TestEnvironment.Credential);
+            } else
+            {
+                return new ArmClient(TestEnvironment.SubscriptionId, TestEnvironment.Credential);
+            }
         }
 
         public async Task CreateVm(
@@ -281,56 +287,6 @@ namespace Azure.ResourceManager.Network.Tests.Helpers
             return getCircuitResponse;
         }
 
-        public async Task<RouteFilter> CreateDefaultRouteFilter(string resourceGroupName, string filterName, string location,
-            bool containsRule = false)
-        {
-            var filter = new RouteFilterData()
-            {
-                Location = location,
-                Tags = { { "key", "value" } }
-            };
-
-            if (containsRule)
-            {
-                var rule = new RouteFilterRuleData()
-                {
-                    Name = "test",
-                    Access = ExpressRouteTests.Filter_Access,
-                    Communities = { ExpressRouteTests.Filter_Commmunity },
-                    Location = location
-                };
-
-                filter.Rules.Add(rule);
-            }
-
-            // Put route filter
-            Operation<RouteFilter> filterOperation = await GetResourceGroup(resourceGroupName).GetRouteFilters().StartCreateOrUpdateAsync(filterName, filter);
-            Response<RouteFilter> filterResponse = await WaitForCompletionAsync(filterOperation);
-            Assert.AreEqual("Succeeded", filterResponse.Value.Data.ProvisioningState.ToString());
-            Response<RouteFilter> getFilterResponse = await GetResourceGroup(resourceGroupName).GetRouteFilters().GetAsync(resourceGroupName, filterName);
-
-            return getFilterResponse;
-        }
-
-        public async Task<RouteFilter> CreateDefaultRouteFilterRule(string resourceGroupName, string filterName, string ruleName, string location)
-        {
-            var rule = new RouteFilterRuleData()
-            {
-                Access = ExpressRouteTests.Filter_Access,
-                Communities = { ExpressRouteTests.Filter_Commmunity },
-                Location = location
-            };
-
-            // Put route filter rule
-            var filterContainer = GetResourceGroup(resourceGroupName).GetRouteFilters();
-            Operation<RouteFilterRule> ruleOperation = await filterContainer.Get(filterName).Value.GetRouteFilterRules().StartCreateOrUpdateAsync(ruleName, rule);
-            Response<RouteFilterRule> ruleResponse = await WaitForCompletionAsync(ruleOperation);
-            Assert.AreEqual("Succeeded", ruleResponse.Value.Data.ProvisioningState.ToString());
-            Response<RouteFilter> getFilterResponse = await filterContainer.GetAsync(resourceGroupName, filterName);
-
-            return getFilterResponse;
-        }
-
         public async Task<PublicIPAddress> CreateDefaultPublicIpAddress(string name, string resourceGroupName, string domainNameLabel, string location)
         {
             var publicIp = new PublicIPAddressData()
@@ -456,6 +412,11 @@ namespace Azure.ResourceManager.Network.Tests.Helpers
         protected RouteTableContainer GetRouteTableContainer(string resourceGroupName)
         {
             return GetResourceGroup(resourceGroupName).GetRouteTables();
+        }
+
+        protected RouteFilterContainer GetRouteFilterContainer(string resourceGroupName)
+        {
+            return GetResourceGroup(resourceGroupName).GetRouteFilters();
         }
 
         protected NetworkWatcherContainer GetNetworkWatcherContainer(string resourceGroupName)

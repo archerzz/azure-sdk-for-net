@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Core;
 using Azure.Core.TestFramework;
 using Azure.ResourceManager.Resources;
 using Azure.ResourceManager.Resources.Models;
+using Azure.ResourceManager.Network.Models;
 using Azure.ResourceManager.Network.Tests.Helpers;
 using NUnit.Framework;
 
@@ -48,59 +50,16 @@ namespace Azure.ResourceManager.Network.Tests.Tests
         public const string Circuit_BW = "200";
         public const string MS_VlanId = "400";
 
-        public const string Filter_Commmunity = "12076:5010";
-        public const string Filter_Access = "allow";
-        public const string Filter_Type = "Community";
-
         public const string Peering_Microsoft = "MicrosoftPeering";
 
         [Test]
         public async Task BGPCommunityApiTest()
         {
             _ = await NetworkManagementTestUtilities.GetResourceLocation(ResourceManagementClient, "Microsoft.Network/routefilters");
-            AsyncPageable<Models.BgpServiceCommunity> communitiesAsync = ArmClient.DefaultSubscription.ListBgpServiceCommunitiesAsync();
-            Task<List<Models.BgpServiceCommunity>> communities = communitiesAsync.ToEnumerableAsync();
-            Assert.NotNull(communities);
-            Assert.True(communities.Result.First().BgpCommunities.First().IsAuthorizedToUse);
-        }
-
-        [Test]
-        public async Task RouteFilterApiTest()
-        {
-            string resourceGroupName = Recording.GenerateAssetName("csmrg");
-
-            string location = await NetworkManagementTestUtilities.GetResourceLocation(ResourceManagementClient, "Microsoft.Network/routefilters");
-            await ResourceGroupsOperations.CreateOrUpdateAsync(resourceGroupName, new ResourceGroup(location));
-
-            // Create route filter
-            string filterName = "filter";
-            string ruleName = "rule";
-
-            RouteFilter filter = await CreateDefaultRouteFilter(resourceGroupName,
-                filterName, location);
-
-            Assert.AreEqual(filter.Data.Name, filterName);
-            Assert.IsEmpty(filter.Data.Rules);
-
-            // Update route filter with rule by put on parent resources
-            filter = await CreateDefaultRouteFilter(resourceGroupName,
-                filterName, location, true);
-
-            Assert.AreEqual(filter.Data.Name, filterName);
-            Assert.IsNotEmpty(filter.Data.Rules);
-
-            // Update route filter and delete rules
-            filter = await CreateDefaultRouteFilter(resourceGroupName,
-               filterName, location);
-
-            Assert.AreEqual(filter.Data.Name, filterName);
-            Assert.IsEmpty(filter.Data.Rules);
-
-            filter = await CreateDefaultRouteFilterRule(resourceGroupName,
-                filterName, ruleName, location);
-
-            Assert.AreEqual(filter.Data.Name, filterName);
-            Assert.IsNotEmpty(filter.Data.Rules);
+            AsyncPageable<BgpServiceCommunity> communitiesAsync = ArmClient.DefaultSubscription.ListBgpServiceCommunitiesAsync();
+            List<BgpServiceCommunity> communities = await communitiesAsync.ToEnumerableAsync();
+            Assert.IsNotEmpty(communities);
+            Assert.True(communities.First().BgpCommunities.First().IsAuthorizedToUse);
         }
 
         [Test]
