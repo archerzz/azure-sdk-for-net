@@ -104,6 +104,13 @@ namespace Azure.ResourceManager.Network.Tests.Helpers
             }
         }
 
+        protected async Task<Response<Core.ResourceGroup>> CreateResourceGroup(string name)
+        {
+            string location = TestEnvironment.Location;
+            await ResourceGroupsOperations.CreateOrUpdateAsync(name, new Resources.Models.ResourceGroup(location));
+            return await ArmClient.DefaultSubscription.GetResourceGroups().GetAsync(name);
+        }
+
         public async Task CreateVm(
             ResourcesManagementClient resourcesClient,
             string resourceGroupName,
