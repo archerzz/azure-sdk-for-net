@@ -5,7 +5,7 @@ This is an experiment project which describes Data plane Codegen(DPG) grow up st
 - Grow the SDK to feature equivalence to the current SDK. 
 - To confirm feature equivalence, run the existing live tests.
 
-In this experiment, we have updated configurations in autorest.md, manually added customized codes such as convenient methods for generated DPG methods, models, customized authentication, convenient methods to convert input model to RequestContent and Response to output model. In this tutorial, we will explain the step by step process of this experiment.
+In this experiment, we have updated configurations in autorest.md, manually added customized codes such as convenience methods for generated DPG methods, models, customized authentication, helper methods to convert input model to RequestContent and Response to output model. In this tutorial, we will explain the step by step process of this experiment.
 
 ### 1. Update autorest.md
 
@@ -26,14 +26,14 @@ In order to add grow up methods on the top of DPG generated code, we first need 
 * Released clients have APIs which take `CancellationToken` but DPG generated APIs take [RequestContext](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/src/RequestContext.cs#L15) and `CancellationToken` is one of the property of it.
 * Released clients have APIs which take input model and return output model but DPG APIs take [RequestContent](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/src/RequestContent.cs#L18) instead of input model and return [Response](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/src/Response.cs) instead of output model.
 
-  For this experiment we will add convenient method with the same method signature as released client API. In the convenient method implementation we will convert input model to `RequestContent`, call underline generated protocol method and convert `Response` to Output model.
+  For this experiment we will add convenience method with the same method signature as released client API. In the convenience method implementation we will convert input model to `RequestContent`, call underline generated protocol method and convert `Response` to Output model.
 
   In order to convert input model to RequestContent and Response to output model, we have to added internal [ToRequestContent(InputModel model)](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/Models/DataFeedDetail.Serialization.cs#L493) and [FromResponse(Response response)](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/Models/DataFeedDetail.Serialization.cs#L487) methods.
 
 
 ### 3. Pick a list of Metrics Advisor APIs to do the experiment
 
-As there are many APIs, working on the full list of APIs and adding convenient methods can be time-consuming. To prove the concept of grow up story, we have selected a list of APIs to test based on the following criteria:
+As there are many APIs, working on the full list of APIs and adding convenience methods can be time-consuming. To prove the concept of grow up story, we have selected a list of APIs to test based on the following criteria:
 
 * APIs exposed from both MetricsAdvisorAdministrationClient and MetricsAdvisorClient
 * Contains a mixture of all four http methods:  GET, POST, DELETE, PATCH
@@ -58,7 +58,7 @@ As there are many APIs, working on the full list of APIs and adding convenient m
 
 We have manually added models [here](https://github.com/ShivangiReja/azure-sdk-for-net/tree/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/Models) and other customized files [here](https://github.com/ShivangiReja/azure-sdk-for-net/tree/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src) outside of generated folder.
 
-### 5. Customize Authentication
+### 5. Customize authentication
 
 In the released library, customized `MetricsAdvisorKeyCredential` authentication is supported for `MetricsAdvisorClient` and `MetricsAdvisorAdministrationClient`. So for this expermient, we have added a constructor in [MetricsAdvisorClient](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/MetricsAdvisorClient.cs#L36) and [MetricsAdvisorAdministrationClient](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/MetricsAdvisorAdministrationClient.cs#L41) partial classes which takes  `MetricsAdvisorKeyCredential`.
 
@@ -70,11 +70,11 @@ In the released library `MetricsAdvisorAdministrationClient` is in the `Azure.AI
 
 Generate DPG SDK by running `dotnet build /t:GenerateCode` under `sdk\metricsadvisor\Azure.AI.MetricsAdvisor\src` directory.
 
-### 8. Add Convenient methods
+### 8. Add convenience methods
 
-We have selected a set of APIs to add convenient methods as explained above. The table below shows the APIs we have selected, and the corresponding convenient methods.
+We have selected a set of APIs to add convenience methods as explained above. The table below shows the APIs we have selected, and the corresponding convenience methods.
 
-| Convenient method                                     | DPG method                                   | Client                                 | HTTP Method | Return type| Parameters
+| Convenience method                                     | DPG method                                   | Client                                 | HTTP Method | Return type| Parameters
 |-----------------------------------------|-----------------------------------------|-----------------------------------------|-------------------------------------------------------------------------------|--------------|--------------|
 | [GetAllFeedback](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/MetricsAdvisorClient.cs#L138-L208) | [GetMetricFeedbacks](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/Generated/MetricsAdvisorClient.cs#L1585-L1675) | MetricsAdvisorClient               | POST   | `Pageable<MetricFeedback>`    | `string`, `GetAllFeedbackOptions`|
 | [AddFeedback](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/MetricsAdvisorClient.cs#L220-L302) | [CreateMetricFeedback](https://github.com/ShivangiReja/azure-sdk-for-net/blob/MetricsAdvisor-Experiment/sdk/metricsadvisor/Azure.AI.MetricsAdvisor/src/Generated/MetricsAdvisorClient.cs#L456-L515) | MetricsAdvisorClient               | POST   | `<Response<MetricFeedback>`    | `MetricFeedback` |
@@ -104,7 +104,7 @@ We have also compared the performance between the HLC APIs(released APIs) and DP
 |   GetDataFeeds |  99.41 μs | 1.948 μs | 1.727 μs | 7.0801 |     30 KB |
 
 
-#### DPG + Convenience APIs Result:
+#### Convenience + DPG APIs Result:
 
 |         Method |     Mean |    Error |   StdDev |  Gen 0 | Allocated |
 |--------------- |---------:|---------:|---------:|-------:|----------:|
